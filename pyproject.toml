@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pygong"
+dynamic = ["version"]
+#version = "0.0.1"
+authors = [
+    {name="gongwendong",email='gwd163nom@163.com'},
+]
+maintainers = [
+    {name="gongwendong",email='gwd163nom@163.com'},
+]
+description = "Supported for python dev common utils collection library."
+readme = {file="README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+requires-python = ">=3.1"
+keywords = ["python utils","python common"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/agodomen/pygong"
+Documentation = "https://github.com/agodomen/pygong/blob/main/README_ZH.md"
+Repository = "https://github.com/agodomen/pygong.git"
+Issues = "https://github.com/agodomen/pygong/issues"
+Changelog = "https://github.com/agodomen/pygong/blob/main/CHANGELOG.md"

@@ -1,0 +1,11 @@
+language: python
+
+sudo: true
+fast_finish: true
+
+install:
+  - pip install -r requirements.txt
+
+branches:
+  only:
+    - main
