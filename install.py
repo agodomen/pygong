@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 def find_version():
     # --- get version ---
     base_version = "unknown"
-    with open("src/version.py") as f:
+    with open("src/pygong/version.py") as f:
         line = f.read().strip().split('\n')[0]
         base_version = line.replace("version = ", "").replace('"', '')
     # --- get version ---
@@ -150,8 +150,8 @@ setup(
     url=URL,
     platforms=['any'],
     keywords='python utils,python common',
-    packages=find_packages(exclude=["tests.*", "tests",'docs','examples']),
-    package_data=find_package_data(PACKAGE, only_in_packages=False),
+    packages=find_packages(exclude=["tests.*","tests",'docs']),
+    # package_data=find_package_data(PACKAGE, only_in_packages=False),
     classifiers=[
         "Development Status :: 3",
         "Intended Audience :: Developers",

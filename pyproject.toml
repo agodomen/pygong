@@ -1,4 +1,6 @@
 [build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
@@ -22,6 +24,23 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "pint"
+]
+
+#[tool.setuptools.packages.find]
+#where = [
+#    "src/pygong"
+#]
+#
+#[tool.setuptools]
+#package-dir = {"" = "src"}
+#include-package-data = false
+
+[tool.setuptools.dynamic]
+version = {file = "src/pygong/pygong.VERSION"}
+#version = {attr = "version"}
+readme = {file = ["README.md"]}
 
 [project.urls]
 Homepage = "https://github.com/agodomen/pygong"

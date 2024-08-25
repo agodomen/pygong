@@ -1,6 +1,5 @@
 import errno
-import fcntl
-import os
+from . import io_fcntl
 import time
 from logging.handlers import TimedRotatingFileHandler
 import logging
@@ -61,7 +60,7 @@ class ConcurrentTimedRotatingFileHandler(TimedRotatingFileHandler):
         # 兼容多进程并发 LOG_ROTATE
         if not os.path.exists(dfn):
             f = open(self.baseFilename, 'a')
-            fcntl.lockf(f.fileno(), fcntl.LOCK_EX)
+            io_fcntl.lockf(f.fileno(), io_fcntl.LOCK_EX)
             if not os.path.exists(dfn):
                 os.rename(self.baseFilename, dfn)
             # 释放锁 释放老 log 句柄
@@ -86,48 +85,56 @@ class ConcurrentTimedRotatingFileHandler(TimedRotatingFileHandler):
                 newRolloverAt += addend
         self.rolloverAt = newRolloverAt
 
+class CommonLogger():
+    def __init__(self,file_location="log/prog.log",handler_suffix="%Y%m%d.log",formatter=None):
+
+        if formatter is None:
+            formatter = ColoredFormatter('%(asctime)s - %(process)d - %(threadName)s - %(levelname)s - %(funcName)s - %(lineno)s - %(message)s')
+
+        # 创建控制台输出的Handler
+        lock = threading.Lock()
+        self.console_handler = logging.StreamHandler()
+        self.console_handler.setLevel(logging.INFO)
+        # formatter = ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.console_handler.setLevel(logging.DEBUG)
+        self.console_handler.setFormatter(formatter)
 
 
-logger = logging.getLogger("prog")
-logger.setLevel(logging.DEBUG)
 
-# 创建控制台输出的Handler
-lock = threading.Lock()
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-formatter = ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-formatter = ColoredFormatter(
-    '%(asctime)s - %(process)d - %(threadName)s - %(levelname)s - %(funcName)s - %(lineno)s - %(message)s')
-console_handler.setLevel(logging.DEBUG)
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+        # 创建文件输出的Handler
+        # file_handler = logging.FileHandler('example.log')
+        # file_handler.setLevel(logging.DEBUG)
+        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # file_handler.setFormatter(formatter)
 
+        if not os.path.exists(file_location):
+            if mimetypes.guess_type(file_location)[0] is not None or file_location.endswith(".log"):
+                location = os.path.dirname(file_location)
+            else:
+                location = file_location
+            try:
+                with lock:
+                    if not os.path.exists(location):
+                        os.makedirs(location)
+            except OSError as err:
+                if err.errno != errno.EEXIST:
+                    raise
+                self.file_location = file_location
 
-# 创建文件输出的Handler
-# file_handler = logging.FileHandler('example.log')
-# file_handler.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# file_handler.setFormatter(formatter)
-default_location="log/prog.log"
-if not os.path.exists(default_location):
-    if mimetypes.guess_type(default_location)[0] is not None:
-        location = os.path.dirname(default_location)
-    else:
-        location = default_location
-    try:
-        with lock:
-            if not os.path.exists(location):
-                os.makedirs(location)
-    except OSError as err:
-        if err.errno != errno.EEXIST:
-            raise
-file_handler = ConcurrentTimedRotatingFileHandler(default_location, when='d', backupCount=7, encoding="utf-8")
-file_handler.suffix = "%Y%m%d.log"
-# ch = logging.StreamHandler()
-# NOTSET->DEBUG->INFO->WARN->ERROR->FATAL->CRITICAL
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
+        self.file_handler = ConcurrentTimedRotatingFileHandler(file_location, when='d', backupCount=7, encoding="utf-8")
+        self.file_handler.suffix = handler_suffix
+        # ch = logging.StreamHandler()
+        # NOTSET->DEBUG->INFO->WARN->ERROR->FATAL->CRITICAL
+        self.file_handler.setLevel(logging.INFO)
+        self.file_handler.setFormatter(formatter)
+    def getLogger(self):
+        logger = logging.getLogger("prog")
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(self.file_handler)
+        logger.addHandler(self.console_handler)
+        return logger
 
+logger = CommonLogger().getLogger()
 def get_logger():
     return logger
+
