@@ -20,7 +20,7 @@ pip install xxx.whl
 ## Direct installation
 
 ```shell
-pip install pygong\
+pip install pygong
 pip install -i https://pypi.org/simple pygong
 ```
 ```shell
