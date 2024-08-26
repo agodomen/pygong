@@ -12,5 +12,6 @@ del /S /Q src/pygong/pygong.egg-info
 @REM python setup.py bdist_wheel --universal
 python -m build
 python -m twine upload --repository testpypi dist/* --skip-existing
+python -m twine upload --repository pypi dist/* --skip-existing
 :: python -m twine upload --repository testpypi dist/* --skip-existing
 

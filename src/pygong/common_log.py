@@ -127,10 +127,27 @@ class CommonLogger():
         # NOTSET->DEBUG->INFO->WARN->ERROR->FATAL->CRITICAL
         self.file_handler.setLevel(logging.INFO)
         self.file_handler.setFormatter(formatter)
+
+
+    def getFileLogger(self):
+        logger.addHandler(self.file_handler)
+        return logger
+
+    def getFileLogger(self,file_handler):
+        logger.addHandler(file_handler)
+        return logger
+
+    def getFileLogger(self,file_handler):
+        logger.removeHandler(file_handler)
+        return logger
+    def removeFileLogger(self):
+        logger.removeHandler(self.file_handler)
+        return logger
+
     def getLogger(self):
         logger = logging.getLogger("prog")
         logger.setLevel(logging.DEBUG)
-        logger.addHandler(self.file_handler)
+
         logger.addHandler(self.console_handler)
         return logger
 

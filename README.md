@@ -20,9 +20,12 @@ pip install xxx.whl
 ## Direct installation
 
 ```shell
-pip install pygong
+pip install pygong\
+pip install -i https://pypi.org/simple pygong
 ```
-
+```shell
+pip install -i https://pypi.org/simple pygong --upgrade
+```
 # License
 
 Apache 2.0
@@ -30,5 +33,7 @@ Apache 2.0
 # Refer
 
 https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
 https://daobook.github.io/flit/pyproject_toml.html
+
 https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
