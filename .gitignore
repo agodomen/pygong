@@ -3,3 +3,5 @@ dist
 build
 pygong.egg-info
 **/__pycache__
+log
+**/log
