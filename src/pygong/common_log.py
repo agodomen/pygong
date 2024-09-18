@@ -86,27 +86,37 @@ class ConcurrentTimedRotatingFileHandler(TimedRotatingFileHandler):
         self.rolloverAt = newRolloverAt
 
 class CommonLogger():
-    def __init__(self,file_location="log/prog.log",handler_suffix="%Y%m%d.log",formatter=None):
+    def __init__(self,file_location=None,handler_suffix=None,formatter=None):
 
         if formatter is None:
             formatter = ColoredFormatter('%(asctime)s - %(process)d - %(threadName)s - %(levelname)s - %(funcName)s - %(lineno)s - %(message)s')
-
-        # 创建控制台输出的Handler
-        lock = threading.Lock()
+        if file_location is None:
+            file_location = "log/pygong.log"
+        if handler_suffix is None:
+            handler_suffix = "%Y%m%d.log"
         self.console_handler = logging.StreamHandler()
         self.console_handler.setLevel(logging.INFO)
         # formatter = ColoredFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         self.console_handler.setLevel(logging.DEBUG)
+        self.formatter = formatter
         self.console_handler.setFormatter(formatter)
+        self.file_location = file_location
+        self.file_handler = None
+        self.handler_suffix = handler_suffix
+        self.logger = None
 
 
-
+    def openFileLogger(self):
+        # 创建控制台输出的Handler
+        lock = threading.Lock()
         # 创建文件输出的Handler
         # file_handler = logging.FileHandler('example.log')
         # file_handler.setLevel(logging.DEBUG)
         # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         # file_handler.setFormatter(formatter)
-
+        file_location =  self.file_location
+        formatter = self.formatter
+        handler_suffix =  self.handler_suffix
         if not os.path.exists(file_location):
             if mimetypes.guess_type(file_location)[0] is not None or file_location.endswith(".log"):
                 location = os.path.dirname(file_location)
@@ -127,31 +137,70 @@ class CommonLogger():
         # NOTSET->DEBUG->INFO->WARN->ERROR->FATAL->CRITICAL
         self.file_handler.setLevel(logging.INFO)
         self.file_handler.setFormatter(formatter)
-
-
-    def getFileLogger(self):
-        logger.addHandler(self.file_handler)
         return logger
 
-    def getFileLogger(self,file_handler):
-        logger.addHandler(file_handler)
-        return logger
+    def setFileLogger(self,file_handler):
+        """
+        set file handler
+        :param file_handler:
+        :return:
+        """
+        self.logger.addHandler(file_handler)
+        return self.logger
 
-    def getFileLogger(self,file_handler):
-        logger.removeHandler(file_handler)
-        return logger
+    def updateFileLogger(self,file_handler):
+        """
+        change file handler
+        :param file_handler:
+        :return:
+        """
+        self.logger.removeHandler(file_handler)
+        return self.logger
+
     def removeFileLogger(self):
-        logger.removeHandler(self.file_handler)
-        return logger
+        """
+        remove the logger file handler
+        :return:
+        """
+        self.logger.removeHandler(self.file_handler)
+        return self.logger
 
-    def getLogger(self):
-        logger = logging.getLogger("prog")
+    def getNewLogger(self,name=None):
+        """
+        get new logger without to update common logger manager
+        :param name:
+        :return:
+        """
+        logger = logging.getLogger(name)
         logger.setLevel(logging.DEBUG)
-
         logger.addHandler(self.console_handler)
         return logger
 
-logger = CommonLogger().getLogger()
+    def setLogger(self,logger):
+        """ set new logger
+        :param logger:
+        :return:
+        """
+        self.logger = logger
+        return logger
+
+    def getLogger(self,name=None):
+        """
+        to get logger
+        :param name:
+        :return:
+        """
+        if name is None:
+            name = "pygong"
+        if self.logger is None:
+            logger = self.getNewLogger(name)
+            self.logger = logger
+            return logger
+        else:
+            return self.logger
+
+common_logger = CommonLogger()
+logger = common_logger.getLogger()
 def get_logger():
     return logger
 
